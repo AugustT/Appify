@@ -465,7 +465,7 @@ shinyServer(function(input, output, session) {
         
         # pred is rounded so that very slight minus values become 0
         # this is matched by the legend
-        pred_ras <- setValues(pred_ras, 
+        pred_ras <- raster::setValues(pred_ras, 
                               round(pred, 2))
         
         # get legend values
