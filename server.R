@@ -363,6 +363,13 @@ shinyServer(function(input, output, session) {
     local({ # There is some strange environment stuff that goes on here
       my_j <- j
       output[[paste('model_print', my_j, sep = '_')]] <- renderUI({
+        
+        # Load in the packages used to create the model as they
+        # will have special print methods
+        for(package in input_data$model[[my_j]]$model$packages){
+          zoon::GetPackage(package)
+        }
+        
         x <- capture.output(print(input_data$model[[my_j]]$model$model))
         div(br(),
             p(code(paste('Occurrence module:', attr(input_data$model[[my_j]], 'call_path')$occurrence)),
