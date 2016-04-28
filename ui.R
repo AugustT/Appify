@@ -13,7 +13,8 @@ shinyUI(navbarPage("Appify",
                                 downloadButton('downloadOccData', 'Download')
                               ),
                               mainPanel(
-                                uiOutput("occurrence_tabs")
+                                uiOutput("occurrence_tabs"),
+                                br()
                               )
                             )
                    ),
@@ -26,7 +27,8 @@ shinyUI(navbarPage("Appify",
                                 downloadButton('downloadCovData', 'Download')
                               ),
                               mainPanel(
-                                uiOutput("covariate_tabs")
+                                uiOutput("covariate_tabs"),
+                                br()
                               )
                             )
                    ),
@@ -49,7 +51,8 @@ shinyUI(navbarPage("Appify",
                                 downloadButton('downloadModelData', 'Download')
                               ),
                               mainPanel(
-                                uiOutput("model_tabs")
+                                uiOutput("model_tabs"),
+                                br()
                               )
                             )
                    ),
@@ -60,7 +63,8 @@ shinyUI(navbarPage("Appify",
                                 uiOutput('pred_text')
                               ),
                               mainPanel(
-                                uiOutput("pred_tabs")
+                                uiOutput("pred_tabs"),
+                                br()
                               )
                             )
                    )

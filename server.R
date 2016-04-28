@@ -364,9 +364,9 @@ shinyServer(function(input, output, session) {
       output[[paste('model_print', my_j, sep = '_')]] <- renderUI({
         x <- capture.output(print(input_data$model[[my_j]]$model$model))
         div(br(),
-            p(code(paste('Occurrence module:', attr(input_data$model[[i]], 'call_path')$occurrence)),
-              code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
-              code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
+            p(code(paste('Occurrence module:', attr(input_data$model[[my_j]], 'call_path')$occurrence)),
+              code(paste('Covariate module:', attr(input_data$model[[my_j]], 'call_path')$covariate)),
+              code(paste('Process module:', attr(input_data$model[[my_j]], 'call_path')$process))),
             h3('Model print summary'),
             div(id = 'model_out',
                 HTML(paste(x, collapse = '<br/>'))))
@@ -446,7 +446,7 @@ shinyServer(function(input, output, session) {
         .ras <- input_data$raster[[grep(cov_ras, ras_mods)]]
         
         # Make the prediction
-        vals <- data.frame(getValues(.ras))
+        vals <- data.frame(raster::getValues(.ras))
         colnames(vals) <- names(.ras)
         
         pred <- ZoonPredict(input_data$model[[my_j]]$model,
