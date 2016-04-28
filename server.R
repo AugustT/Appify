@@ -67,7 +67,7 @@ shinyServer(function(input, output, session) {
                        div(br(),
                            p(code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
                              code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
-                           leafletOutput(paste('occurrence_map', i, sep = '_')),
+                           leaflet::leafletOutput(paste('occurrence_map', i, sep = '_')),
                            br(),
                            DT::dataTableOutput(paste('occurrence_table', i, sep = '_'))
                            )
@@ -218,7 +218,7 @@ shinyServer(function(input, output, session) {
                                        choices = names(input_data$raster[[i]]),
                                        inline = TRUE),
                           br(),
-                          leafletOutput(paste('covariate_map', i, sep = '_'),
+                          leaflet::leafletOutput(paste('covariate_map', i, sep = '_'),
                                         height = '600px')
                           )
       )
@@ -414,7 +414,7 @@ shinyServer(function(input, output, session) {
                           p(code(paste('Occurrence module:', attr(input_data$model[[i]], 'call_path')$occurrence)),
                             code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
                             code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
-                          leafletOutput(paste('pred_map', i, sep = '_'),
+                          leaflet::leafletOutput(paste('pred_map', i, sep = '_'),
                                         height = '600px')
                       )
       )
