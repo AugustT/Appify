@@ -110,13 +110,13 @@ shinyServer(function(input, output, session) {
         df <- input_data$model[[my_j]]$data
         
         # color palettes for circles
-        fill_pal <- colorFactor(grey(c(1, 0, 0.5)),
+        fill_pal <- leaflet::colorFactor(grey(c(1, 0, 0.5)),
                                 domain = c('presence',
                                            'absence',
                                            'background'),
                                 ordered = TRUE)
         
-        border_pal <- colorFactor(grey(c(0, 1, 1)),
+        border_pal <- leaflet::colorFactor(grey(c(0, 1, 1)),
                                   domain = c('absence',
                                              'presence',
                                              'background'),
@@ -496,13 +496,13 @@ shinyServer(function(input, output, session) {
         df <- input_data$model[[my_j]]$data
         
         # color palettes for circles
-        fill_pal <- colorFactor(grey(c(1, 0, 0.5)),
+        fill_pal <- leaflet::colorFactor(grey(c(1, 0, 0.5)),
                                 domain = c('presence',
                                            'absence',
                                            'background'),
                                 ordered = TRUE)
         
-        border_pal <- colorFactor(grey(c(0, 1, 1)),
+        border_pal <- leaflet::colorFactor(grey(c(0, 1, 1)),
                                   domain = c('absence',
                                              'presence',
                                              'background'),
