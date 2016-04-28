@@ -366,8 +366,9 @@ shinyServer(function(input, output, session) {
         
         # Load in the packages used to create the model as they
         # will have special print methods
+        # IDEALLY USE ZOON::GETPACKAGE HERE #
         for(package in input_data$model[[my_j]]$model$packages){
-          zoon::GetPackage(package)
+          require(package, character.only = TRUE)
         }
         
         x <- capture.output(print(input_data$model[[my_j]]$model$model))
