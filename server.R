@@ -3,7 +3,7 @@
 # load in the data
 load(file = 'data/input_data.rdata')
 # get list of modules once
-modules <- GetModuleList()
+modules <- zoon::GetModuleList()
 
 # This function creates links of of modules that are on the repo
 
