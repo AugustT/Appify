@@ -458,7 +458,7 @@ shinyServer(function(input, output, session) {
         vals <- data.frame(raster::getValues(.ras))
         colnames(vals) <- names(.ras)
         
-        pred <- ZoonPredict(input_data$model[[my_j]]$model,
+        pred <- zoon::ZoonPredict(input_data$model[[my_j]]$model,
                             newdata = vals)
         
         pred_ras <- .ras[[1]]
