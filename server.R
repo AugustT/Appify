@@ -248,8 +248,8 @@ shinyServer(function(input, output, session) {
 
         # get covariates colour palette
         cov_pal <- leaflet::colorNumeric(viridis::viridis(10), 
-                                         domain = c(minValue(.ras),
-                                                    maxValue(.ras)), 
+                                         domain = c(raster::minValue(.ras),
+                                                    raster::maxValue(.ras)), 
                                          na.color = 'transparent')
         
         # reproject pred_ras, suppressing warnings
@@ -270,8 +270,8 @@ shinyServer(function(input, output, session) {
         
         
         # get legend values
-        legend_values <- round(seq(minValue(.ras),
-                                   maxValue(.ras),
+        legend_values <- round(seq(raster::minValue(.ras),
+                                   raster::maxValue(.ras),
                                    length.out = 10), 3)
         
         # add legend
