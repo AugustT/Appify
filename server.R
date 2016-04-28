@@ -67,7 +67,8 @@ shinyServer(function(input, output, session) {
                        div(br(),
                            p(code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
                              code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
-                           leaflet::leafletOutput(paste('occurrence_map', i, sep = '_')),
+                           leaflet::leafletOutput(paste('occurrence_map', i, sep = '_'),
+                                                  height = '500px'),
                            br(),
                            DT::dataTableOutput(paste('occurrence_table', i, sep = '_'))
                            )
@@ -219,7 +220,7 @@ shinyServer(function(input, output, session) {
                                        inline = TRUE),
                           br(),
                           leaflet::leafletOutput(paste('covariate_map', i, sep = '_'),
-                                        height = '600px')
+                                        height = '500px')
                           )
       )
       
@@ -415,7 +416,7 @@ shinyServer(function(input, output, session) {
                             code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
                             code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
                           leaflet::leafletOutput(paste('pred_map', i, sep = '_'),
-                                        height = '600px')
+                                        height = '500px')
                       )
       )
       
@@ -556,22 +557,4 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  
-  
-  
-  
-  
-  
-  
-  output$plot <- renderPlot({
-    plot(cars, type=input$plotType)
-  })
-  
-  output$summary <- renderPrint({
-    summary(cars)
-  })
-  
-  output$table <- DT::renderDataTable({
-    DT::datatable(cars)
-  })
 })
