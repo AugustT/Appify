@@ -406,9 +406,7 @@ shinyServer(function(input, output, session) {
              paste0('(', paste(proc_mods, collapse = ', '), '),'),
              'and', length(model_mods), 'model module(s)',
              paste0('(', paste(model_mods, collapse = ', '), ').')
-      )),
-      p('Use the download button to download this data as an R object')
-    )
+      )))
   }) 
 
   # Create the predictions tabs in main panel
