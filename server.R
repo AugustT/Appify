@@ -2,6 +2,22 @@
 
 # load in the data
 load(file = 'data/input_data.rdata')
+# get list of modules once
+modules <- GetModuleList()
+
+# This function creates links of of modules that are on the repo
+
+linkModules <- function(names, modules, type){
+  
+  urlBase <- 'https://github.com/zoonproject/modules/blob/master/R/'
+  
+  sapply(X = names, FUN = function(x, type){
+    if(x %in% modules[[type]]){
+      x <- paste0('<a href="', urlBase, x, '.R" target="_blank">', x, '</a>')    
+    }
+    x
+  }, type = type, USE.NAMES = FALSE)
+}
 
 shinyServer(function(input, output, session) {
   
@@ -9,18 +25,18 @@ shinyServer(function(input, output, session) {
   ## Occurrence ##
   ################
   
-  # Create the occurrence data tab
+  # Create the occurrence text
   output$occurrence_text <- renderUI({
     
-    occ_mods <- unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$occurrence)))
-    proc_mods <- unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process)))
+    occ_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$occurrence))), modules = modules, type = 'occurrence')
+    proc_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process))), modules = modules, type = 'process')
     
     div(
-      p('Here is the occurrence data that was used in the workflow.',
+      p(HTML('Here is the occurrence data that was used in the workflow.',
         'This occurrence data is generated from', length(occ_mods),
         'occurrence module(s)', paste0('(', paste(occ_mods, collapse = ', '), ')'),
         'and', length(proc_mods), 'process module(s)',
-        paste0('(', paste(proc_mods, collapse = ', '), ')')),
+        paste0('(', paste(proc_mods, collapse = ', '), ')'))),
       p('Use the download button to download this data as an R object')
     )
   }) 
@@ -49,6 +65,8 @@ shinyServer(function(input, output, session) {
       
        tab <- tabPanel(title = paste(i, attr(input_data$model[[i]], 'call_path')$occurrence),
                        div(br(),
+                           p(code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
+                             code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
                            leafletOutput(paste('occurrence_map', i, sep = '_')),
                            br(),
                            DT::dataTableOutput(paste('occurrence_table', i, sep = '_'))
@@ -68,7 +86,10 @@ shinyServer(function(input, output, session) {
     local({ # There is some strange environment stuff that goes on here
       my_j <- j
       output[[paste('occurrence_table', my_j, sep = '_')]] <- DT::renderDataTable({
-        DT::datatable(input_data$model[[my_j]]$data)
+        input_data$model[[my_j]]$data[,'type'] <- as.character(input_data$model[[my_j]]$data[,'type'])
+        DT::datatable(input_data$model[[my_j]]$data[,c('value','type','fold','longitude','latitude')],
+                      rownames = FALSE,
+                      filter = 'top')
       })
     })
   }
@@ -159,15 +180,15 @@ shinyServer(function(input, output, session) {
   # Create the covariate text
   output$covariate_text <- renderUI({
     
-    cov_mods <- unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$covariate)))
-    proc_mods <- unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process)))
+    cov_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$covariate))), modules = modules, type = 'covariate')
+    proc_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process))), modules = modules, type = 'process')
     
     div(
-      p('Here is the covariate data that was used in the workflow.',
+      p(HTML('Here is the covariate data that was used in the workflow.',
         'This data is generated from', length(cov_mods),
         'covariate module(s)', paste0('(', paste(cov_mods, collapse = ', '), ')'),
         'and', length(proc_mods), 'process module(s)',
-        paste0('(', paste(proc_mods, collapse = ', '), ')')),
+        paste0('(', paste(proc_mods, collapse = ', '), ')'))),
       p('Use the download button to download this data as an R object')
     )
   }) 
@@ -183,7 +204,7 @@ shinyServer(function(input, output, session) {
     }
   )
   
-  # Create the occ tabs in main panel
+  # Create the cov tabs in main panel
   output$covariate_tabs <- renderUI({
     
     html <- list()
@@ -194,10 +215,11 @@ shinyServer(function(input, output, session) {
                       div(br(),
                           radioButtons(paste0('ras_layer', i),
                                        label = 'Choose layer to display',
-                                       choices = names(input_data$raster[[i]])),
+                                       choices = names(input_data$raster[[i]]),
+                                       inline = TRUE),
                           br(),
                           leafletOutput(paste('covariate_map', i, sep = '_'),
-                                        height = '700px')
+                                        height = '600px')
                           )
       )
       
@@ -270,6 +292,275 @@ shinyServer(function(input, output, session) {
       })
     })
   }
+  
+  
+  ###########
+  ## Model ##
+  ###########
+  
+  # Create the model text
+  output$model_text <- renderUI({
+    
+    occ_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$occurrence))), modules = modules, type = 'occurrence')
+    cov_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$covariate))), modules = modules, type = 'covariate')
+    proc_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process))), modules = modules, type = 'process')
+    model_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$model))), modules = modules, type = 'model')
+    
+    div(
+      p(HTML('Here is the model summary from the workflow.',
+        'This model was generated from', length(occ_mods),
+        'occurrence module(s)', paste0('(', paste(occ_mods, collapse = ', '), '),'),
+        length(cov_mods), 'covariate module(s)',
+        paste0('(', paste(proc_mods, collapse = ', '), '),'),
+        length(proc_mods), 'process module(s)',
+        paste0('(', paste(proc_mods, collapse = ', '), '),'),
+        'and', length(model_mods), 'model module(s)',
+        paste0('(', paste(model_mods, collapse = ', '), ').')
+        )),
+      p('Use the download button to download this data as an R object')
+    )
+  }) 
+  
+  # Download model data
+  output$downloadModelData <- downloadHandler(
+    filename = function() {
+      paste('model-data-', Sys.Date(), '.rdata', sep='')
+    },
+    content = function(file) {
+      model_data <- lapply(input_data$model, function(x){
+        model_data <- x$model
+        attr(model_data, 'call_path') <- attr(x, 'call_path')
+        model_data
+      })
+      save(model_data, file = file)
+    }
+  )
+  
+  # Create the model tabs in main panel
+  output$model_tabs <- renderUI({
+    
+    html <- list()
+    
+    for(i in 1:length(input_data$model)){
+      
+      tab <- tabPanel(title = paste(i, attr(input_data$model[[i]], 'call_path')$model),
+                      div(br(),
+                          uiOutput(paste('model_print', i, sep = '_'))
+                      )
+      )
+      
+      html <- append(html, list(tab))
+      
+    }
+    
+    do.call(tabsetPanel, html)
+    
+  })
+  
+  # Loop through the models and create print summaries
+  for(j in 1:length(input_data$model)){
+    local({ # There is some strange environment stuff that goes on here
+      my_j <- j
+      output[[paste('model_print', my_j, sep = '_')]] <- renderUI({
+        x <- capture.output(print(input_data$model[[my_j]]$model$model))
+        div(br(),
+            p(code(paste('Occurrence module:', attr(input_data$model[[i]], 'call_path')$occurrence)),
+              code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
+              code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
+            h3('Model print summary'),
+            div(id = 'model_out',
+                HTML(paste(x, collapse = '<br/>'))))
+      })
+    })
+  }
+  
+  #################
+  ## Predictions ##
+  #################
+  
+  # Create the model text
+  output$pred_text <- renderUI({
+    
+    occ_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$occurrence))), modules = modules, type = 'occurrence')
+    cov_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$covariate))), modules = modules, type = 'covariate')
+    proc_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$process))), modules = modules, type = 'process')
+    model_mods <- linkModules(unique(unlist(lapply(input_data$model, function(x) attr(x, 'call_path')$model))), modules = modules, type = 'model')
+    
+    div(
+      p(HTML('Here we use the model and to create a prediction surface',
+             'using the original covariate data.',
+             'The model was generated from', length(occ_mods),
+             'occurrence module(s)', paste0('(', paste(occ_mods, collapse = ', '), '),'),
+             length(cov_mods), 'covariate module(s)',
+             paste0('(', paste(proc_mods, collapse = ', '), '),'),
+             length(proc_mods), 'process module(s)',
+             paste0('(', paste(proc_mods, collapse = ', '), '),'),
+             'and', length(model_mods), 'model module(s)',
+             paste0('(', paste(model_mods, collapse = ', '), ').')
+      )),
+      p('Use the download button to download this data as an R object')
+    )
+  }) 
+
+  # Create the predictions tabs in main panel
+  output$pred_tabs <- renderUI({
+    
+    html <- list()
+    
+    for(i in 1:length(input_data$model)){
+      
+      tab <- tabPanel(title = paste(i, attr(input_data$model[[i]], 'call_path')$model),
+                      div(br(),
+                          p(code(paste('Occurrence module:', attr(input_data$model[[i]], 'call_path')$occurrence)),
+                            code(paste('Covariate module:', attr(input_data$model[[i]], 'call_path')$covariate)),
+                            code(paste('Process module:', attr(input_data$model[[i]], 'call_path')$process))),
+                          leafletOutput(paste('pred_map', i, sep = '_'),
+                                        height = '600px')
+                      )
+      )
+      
+      html <- append(html, list(tab))
+      
+    }
+    
+    do.call(tabsetPanel, html)
+    
+  })
+  
+  # Loop through the models and create maps
+  for(f in 1:length(input_data$model)){
+    local({ # There is some strange environment stuff that goes on here
+      my_j <- f
+      output[[paste('pred_map', my_j, sep = '_')]] <- leaflet::renderLeaflet({
+        
+        m <- leaflet::leaflet()
+        m <- leaflet::addTiles(map = m, group = 'OpenStreetMap')
+        m <- leaflet::addProviderTiles(map = m,
+                                       provider = 'Esri.WorldImagery',
+                                       group = 'Esri.WorldImagery')
+        
+        # add training data
+        # which cov layer matches this model?
+        cov_ras <- attr(input_data$model[[my_j]], 'call_path')$covariate
+        ras_mods <- sapply(input_data$raster, function(x) attr(x, 'call_path')$covariate)
+        .ras <- input_data$raster[[grep(cov_ras, ras_mods)]]
+        
+        # Make the prediction
+        vals <- data.frame(getValues(.ras))
+        colnames(vals) <- names(.ras)
+        
+        pred <- ZoonPredict(input_data$model[[my_j]]$model,
+                            newdata = vals)
+        
+        pred_ras <- .ras[[1]]
+        
+        # pred is rounded so that very slight minus values become 0
+        # this is matched by the legend
+        pred_ras <- setValues(pred_ras, 
+                              round(pred, 2))
+        
+        # get legend values
+        legend_values <- round(seq(0, 1, length.out = 10), 2)
+        
+        # get prediction colour palette
+        pred_pal <- leaflet::colorNumeric(viridis::viridis(10), 
+                                          domain = legend_values, 
+                                          na.color = 'transparent')
+        
+        # reproject pred_ras, suppressing warnings
+        suppressWarnings(ext <- raster::projectExtent(pred_ras,
+                                                      crs = sp::CRS('+init=epsg:3857')))
+        suppressWarnings(pred_ras <- raster::projectRaster(pred_ras,
+                                                           ext))
+        
+        # add the prediction raster
+        m <- leaflet::addRasterImage(map = m,
+                                     x = pred_ras,
+                                     colors = pred_pal,
+                                     project = FALSE,
+                                     opacity = 0.8,
+                                     group = 'predicted distribution')
+        
+        # add to the overlay groups list
+        overlay_groups <- 'predicted distribution'
+        
+        
+        # add predicted distribution legend
+        m <- leaflet::addLegend(map = m,
+                                pal = pred_pal,
+                                opacity = 0.8, 
+                                values = legend_values, 
+                                title = 'Predicted distribution')
+        
+        # add training data
+        df <- input_data$model[[my_j]]$data
+        
+        # color palettes for circles
+        fill_pal <- colorFactor(grey(c(1, 0, 0.5)),
+                                domain = c('presence',
+                                           'absence',
+                                           'background'),
+                                ordered = TRUE)
+        
+        border_pal <- colorFactor(grey(c(0, 1, 1)),
+                                  domain = c('absence',
+                                             'presence',
+                                             'background'),
+                                  ordered = TRUE)
+        
+        for (type in c('absence', 'background', 'presence')) {
+          if (any(df$type == type)) {
+            idx <- df$type == type
+            group_name <- paste(type, 'data')
+            overlay_groups <- c(overlay_groups, group_name)
+            m <- leaflet::addCircleMarkers(map = m,
+                                           lng = df$lon[idx],
+                                           lat = df$lat[idx],
+                                           color = grey(0.4),
+                                           fillColor = fill_pal(type),
+                                           weight = 1,
+                                           opacity = 1,
+                                           fillOpacity = 1,
+                                           radius = 5,
+                                           group = group_name,
+                                           popup = paste('<b>',
+                                                         paste(toupper(substr(type, 1, 1)), substr(type, 2, nchar(type)), sep=""),
+                                                         '</b>',
+                                                         '<br>Longitude:', df$lon[idx],
+                                                         '<br>Latitude:', df$lat[idx],
+                                                         '<br>Fold:', df$fold[idx],
+                                                         '<br>Value:', df$value[idx]))
+            
+          }
+        }
+        
+        # add points legend
+        m <- leaflet::addLegend(map = m,
+                                pal = fill_pal,
+                                opacity = 0.8, 
+                                values = factor(c('presence', 'absence', 'background'),
+                                                levels = c('presence', 'absence', 'background'),
+                                                ordered = TRUE),
+                                title = 'Data points')
+        
+        # add toggle for the layers
+        m <- leaflet::addLayersControl(map = m,
+                                       position = "topleft",
+                                       baseGroups = c('OpenStreetMap',
+                                                      'Esri.WorldImagery'),
+                                       overlayGroups = overlay_groups)
+        
+        
+        m
+      })
+    })
+  }
+  
+  
+  
+  
+  
+  
   
   
   output$plot <- renderPlot({

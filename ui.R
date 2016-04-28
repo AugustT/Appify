@@ -30,33 +30,38 @@ shinyUI(navbarPage("Appify",
                               )
                             )
                    ),
-
-                   tabPanel("Covariate data",
-                            verbatimTextOutput("summary")
-                   ),
-                   navbarMenu("More",
-                              tabPanel("Table",
-                                       DT::dataTableOutput("table")
+                   tabPanel("Model",
+                            tags$head(
+                              tags$style(HTML("
+                                #model_out {
+                                  padding: 19px;
+                                  background-color: #f5f5f5;
+                                  border: 1px solid #e3e3e3;
+                                  border-radius: 4px;
+                                }
+                              "))
+                            ),
+                            sidebarLayout(
+                              sidebarPanel(
+                                h2("Model"),
+                                uiOutput('model_text'),
+                                br(),
+                                downloadButton('downloadModelData', 'Download')
                               ),
-                              tabPanel("About",
-                                       fluidRow(
-#                                          column(6,
-#                                                 includeMarkdown("about.md")
-#                                          ),
-                                         column(3,
-                                                img(class="img-polaroid",
-                                                    src=paste0("http://upload.wikimedia.org/",
-                                                               "wikipedia/commons/9/92/",
-                                                               "1919_Ford_Model_T_Highboy_Coupe.jpg")),
-                                                tags$small(
-                                                  "Source: Photographed at the Bay State Antique ",
-                                                  "Automobile Club's July 10, 2005 show at the ",
-                                                  "Endicott Estate in Dedham, MA by ",
-                                                  a(href="http://commons.wikimedia.org/wiki/User:Sfoskett",
-                                                    "User:Sfoskett")
-                                                )
-                                         )
-                                       )
+                              mainPanel(
+                                uiOutput("model_tabs")
                               )
+                            )
+                   ),
+                   tabPanel("Predictions",
+                            sidebarLayout(
+                              sidebarPanel(
+                                h2("Predictions"),
+                                uiOutput('pred_text')
+                              ),
+                              mainPanel(
+                                uiOutput("pred_tabs")
+                              )
+                            )
                    )
 ))
