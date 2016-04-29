@@ -3,6 +3,22 @@
 library(markdown)
 
 shinyUI(navbarPage("Appify",
+                   tabPanel("Overview",
+                            sidebarLayout(
+                              sidebarPanel(
+                                width = 3,
+                                h2("Overview"),
+                                p(HTML('These pages show you the output from a ZOON workflow. <a href="https://zoonproject.wordpress.com/" target="_blank">Zoon</a> is a tool for reproducible species distribution modelling in R. Here you can find the results for the workflow detailed to the right. You’ll find the occurrence data used as well as the covariate data and the model output. Enjoy!'))
+                              ),
+                              mainPanel(
+                                div(img(src = 'https://github.com/zoonproject/blog/raw/master/zoon_top.png',
+                                        width = '100%',
+                                        alt = 'ZOON')),
+                                #h4('Workflow Structure'),
+                                div(htmlOutput('org_chart'))
+                              )
+                            )
+                   ),
                    tabPanel("Occurrence data",
                             sidebarLayout(
                               sidebarPanel(

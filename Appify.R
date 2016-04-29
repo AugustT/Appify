@@ -10,6 +10,7 @@ Appify <- function(.model, .ras, dir = tempdir()){
   zoon:::GetPackage('htmlwidgets')
   zoon:::GetPackage('viridis')
   zoon:::GetPackage('rgdal')
+  zoon:::GetPackage("googleVis")
   
   # Check dir exists
   if(!dir.exists(dir)){
