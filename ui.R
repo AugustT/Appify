@@ -15,6 +15,7 @@ shinyUI(navbarPage("Appify",
                                         width = '100%',
                                         alt = 'ZOON')),
                                 #h4('Workflow Structure'),
+                                br(),
                                 div(htmlOutput('org_chart'))
                               )
                             )
