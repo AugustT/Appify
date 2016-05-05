@@ -9,15 +9,15 @@ modules <- zoon::GetModuleList()
 
 linkModules <- function(names, modules, type){
   
-  urlBase <- 'https://github.com/zoonproject/modules/blob/master/R/'
+  urlBase <- "https://github.com/zoonproject/modules/blob/master/R/"
   isChain <- FALSE
   
-  if(grepl("^Chain\\(", names)){
+  if(any(grepl("^Chain\\(", names))){
     
     isChain <- TRUE
     names <- gsub("^Chain\\(", "", names)
     names <- gsub("\\)$", "", names)
-    names <- trimws(strsplit(names, split = ',')[[1]])
+    names <- trimws(strsplit(names, split = ",")[[1]])
   }
   
   linked <- sapply(X = names, FUN = function(x, type){
