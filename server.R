@@ -1,7 +1,7 @@
 ## server script
 
 # load in the data
-load(file = 'data/input_data.rdata')
+load(file = "data/input_data.rdata")
 # get list of modules once
 modules <- zoon::GetModuleList()
 
@@ -10,13 +10,31 @@ modules <- zoon::GetModuleList()
 linkModules <- function(names, modules, type){
   
   urlBase <- 'https://github.com/zoonproject/modules/blob/master/R/'
+  isChain <- FALSE
   
-  sapply(X = names, FUN = function(x, type){
+  if(grepl("^Chain\\(", names)){
+    
+    isChain <- TRUE
+    names <- gsub("^Chain\\(", "", names)
+    names <- gsub("\\)$", "", names)
+    names <- trimws(strsplit(names, split = ',')[[1]])
+  }
+  
+  linked <- sapply(X = names, FUN = function(x, type){
     if(x %in% modules[[type]]){
       x <- paste0('<a href="', urlBase, x, '.R" target="_blank">', x, '</a>')    
     }
     x
   }, type = type, USE.NAMES = FALSE)
+  
+  if(isChain){
+    
+    linked <- paste0('Chain(', paste(linked, collapse = ', '), ')')
+    
+  }
+  
+  return(linked)
+  
 }
 
 shinyServer(function(input, output, session) {
@@ -383,7 +401,7 @@ shinyServer(function(input, output, session) {
         'This model was generated from', length(occ_mods),
         'occurrence module(s)', paste0('(', paste(occ_mods, collapse = ', '), '),'),
         length(cov_mods), 'covariate module(s)',
-        paste0('(', paste(proc_mods, collapse = ', '), '),'),
+        paste0('(', paste(cov_mods, collapse = ', '), '),'),
         length(proc_mods), 'process module(s)',
         paste0('(', paste(proc_mods, collapse = ', '), '),'),
         'and', length(model_mods), 'model module(s)',
@@ -472,7 +490,7 @@ shinyServer(function(input, output, session) {
              'The model was generated from', length(occ_mods),
              'occurrence module(s)', paste0('(', paste(occ_mods, collapse = ', '), '),'),
              length(cov_mods), 'covariate module(s)',
-             paste0('(', paste(proc_mods, collapse = ', '), '),'),
+             paste0('(', paste(cov_mods, collapse = ', '), '),'),
              length(proc_mods), 'process module(s)',
              paste0('(', paste(proc_mods, collapse = ', '), '),'),
              'and', length(model_mods), 'model module(s)',

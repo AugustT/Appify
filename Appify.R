@@ -14,8 +14,7 @@ Appify <- function(.model, .ras, dir = tempdir()){
   
   # Check dir exists
   if(!dir.exists(dir)){
-    warning(paste('Directory', dir, 'does not exist. Appify will attempt to create it.'))
-    dir.create(dir)
+    stop(paste('Directory', dir, 'does not exist. Please create this first so that Appify can write to it'))
   } 
   
   # Create the data object to be used in the app
